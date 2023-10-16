@@ -1,12 +1,8 @@
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const Postagem = new Schema({
+const PostagemSchema = new Schema({
     titulo: {
-        type: String,
-        required: true
-    },
-    slug: {
         type: String,
         required: true
     },
@@ -20,13 +16,18 @@ const Postagem = new Schema({
     },
     categoria: {
         type: Schema.Types.ObjectId,
-        ref: "Categoria",
-        required: true,
+        ref: 'Categoria',
+        required: true
+    },
+    slug: {
+        type: String,
+        required: true
     },
     data: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     }
-})
+});
 
-mongoose.model("postagem", Postagem)
+module.exports = mongoose.model('Postagem', PostagemSchema);
+
