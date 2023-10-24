@@ -57,24 +57,33 @@ mongoose.connect('mongodb://127.0.0.1:27017/blogapp', {
 // Public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rotas
-app.use('/admin', adminRoutes);
-
-// Lista de Postagens
-app.get('/postagens', (req, res) => {
-  Postagem.find().lean().then((postagens) => {
-    res.render('admin/postagens', { postagens: postagens });
+// Rotas para o aplicativo principal
+app.get('/', (req, res) => {
+  Postagem.find().lean().populate("categoria").sort({data: 'desc'}).then((postagens) => {
+      res.render("index", {postagens: postagens})
   }).catch((err) => {
-    req.flash('error_msg', 'Houve um erro ao listar as postagens!');
-    res.redirect('/admin');
-  });
+      req.flash("error_msg", "Não foi possível carregar os posts")
+      res.redirect("/404")
+  })
+})
+
+app.get("/404", (req,res) => {
+  res.send("Erro 404!")
+})
+
+app.get('/posts', (req, res) => {
+  res.send('Página de posts');
 });
+
+// Rotas para a área de administração
+app.use('/admin', adminRoutes);
 
 // Servidor
 const PORT = 8031;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
 
 
 

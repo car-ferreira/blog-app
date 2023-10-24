@@ -13,15 +13,7 @@ const hbs = exphbs.create({
     allowProtoPropertiesByDefault: true
 });
 
-router.get('/', (req, res) => {
-    res.render('admin/index');
-});
-
-router.get('/posts', (req, res) => {
-    res.send('Página de posts');
-});
-
-// Rota para listar categorias
+// Rotas para açoes nas categorias
 router.get('/categorias', (req, res) => {
     Categoria.find().sort({ date: 'desc' }).lean()
         .then((categorias) => {
@@ -33,7 +25,6 @@ router.get('/categorias', (req, res) => {
         });
 });
 
-// Rota para adicionar categoria
 router.get('/categorias/add', (req, res) => {
     res.render('admin/addcategorias');
 });
@@ -107,6 +98,7 @@ router.post("/categorias/deletar", (req, res) => {
     })
 });
 
+// Rotas para açoes nas postagens
 router.get("/postagens", (req, res) => {
     Postagem.find().lean().populate("categoria").sort({ data: "desc" }).then((postagens) => {
         res.render("admin/postagens", { postagens: postagens });
@@ -192,6 +184,17 @@ router.post("/postagens/edit", (req,res) => {
         res.redirect("/admin/postagens")
     })
 })
+
+router.get("/postagens/deletar/:id", (req, res) => {
+    Postagem.deleteOne({_id: req.params.id}).then(() => {
+        req.flash("success_msg", "Postagem deletada com sucesso!")
+        res.redirect("/admin/postagens")
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao deletar a postagem")
+        res.redirect("/admin/postagens")
+    })
+})
+
 
 module.exports = router;
 
