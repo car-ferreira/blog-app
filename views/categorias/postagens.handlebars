@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h2 class="mb-4">Postagens da categoria {{categoria.nome}}</h2>
+      {{#each postagens}}
+      <div class="card mt-4">
+        <div class="card-body">
+          <h3>{{titulo}}</h3>
+          <p>{{descricao}}</p>
+          <a href="/postagem/{{slug}}" class="btn btn-success">Leia mais</a>
+          <hr>
+          <small>Data de publicação: {{data}}</small>
+        </div>
+      </div>
+      {{else}}
+      <h5>Nenhuma postagem</h5>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+

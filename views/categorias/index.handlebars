@@ -1,0 +1,47 @@
+<style>
+  .categoria-lista {
+    list-style: none; 
+    padding: 0; 
+  }
+
+  .categoria-item {
+    font-size: 20px;
+    margin-bottom: 10px; 
+    border: 1px solid #ccc; 
+    padding: 10px; 
+  }
+
+  .categoria-link {
+    color: #000000; 
+    text-decoration: none; 
+  }
+
+  .categoria-link:hover {
+    text-decoration: underline; 
+  }
+</style>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h2 class="mb-4">Categorias</h2>
+      <hr>
+      <ul class="categoria-lista">
+        {{#each categorias}}
+          <li class="categoria-item">
+            <a href="/categorias/{{slug}}" class="categoria-link">{{nome}}</a>
+          </li>
+        {{/each}}
+      </ul>
+      {{#unless categorias.length}}
+        <p>Nenhuma categoria encontrada</p>
+      {{/unless}}
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

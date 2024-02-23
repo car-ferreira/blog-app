@@ -1,21 +1,26 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
-const bodyParser = require('body-parser');
 const path = require('path');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('connect-flash');
 const Postagem = require('./models/Postagem');
 const adminRoutes = require('./routes/admin');
+const Categoria = require('./models/Categoria');
 
 const app = express();
 
-// Configurações
+// Configurações do Handlebars
 const hbs = exphbs.create({
   defaultLayout: 'main',
   partialsDir: path.join(__dirname, 'views/partials'),
   allowProtoMethodsByDefault: true,
-  allowProtoPropertiesByDefault: true
+  allowProtoPropertiesByDefault: true,
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+  }
 });
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
@@ -57,13 +62,58 @@ mongoose.connect('mongodb://127.0.0.1:27017/blogapp', {
 // Public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rotas para o aplicativo principal
+// Rota para o aplicativo principal
 app.get('/', (req, res) => {
-  Postagem.find().lean().populate("categoria").sort({data: 'desc'}).then((postagens) => {
+  Postagem.find().populate("categoria").sort({data: 'desc'}).lean().then((postagens) => {
       res.render("index", {postagens: postagens})
   }).catch((err) => {
       req.flash("error_msg", "Não foi possível carregar os posts")
       res.redirect("/404")
+  })
+})
+
+app.get('/postagem/:slug', (req,res) => {
+    const slug = req.params.slug
+    Postagem.findOne({slug}).lean().then(postagem => {
+        if(postagem){
+            res.render('postagem/index', { postagem });
+        }else{
+            req.flash("error_msg", "Essa postagem nao existe")
+            res.redirect("/")
+        }
+    }).catch(err => {
+        req.flash("error_msg", "Houve um erro interno")
+        res.redirect("/")
+    })
+})
+
+// Rota para listar as postagens de uma categoria específica
+app.get("/categorias/:slug", (req, res) => {
+  Categoria.findOne({ slug: req.params.slug }).then((categoria) => {
+    if (categoria) {
+      Postagem.find({ categoria: categoria._id }).then((postagens) => {
+        res.render("categorias/postagens", { postagens: postagens, categoria: categoria });
+      }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao listar os posts");
+        res.redirect("/");
+      });
+    } else {
+      req.flash("error_msg", "Essa categoria não existe");
+      res.redirect("/");
+    }
+  }).catch((err) => {
+    req.flash("error_msg", "Houve um erro interno ao carregar a página desta categoria");
+    res.redirect("/");
+  });
+});
+
+// Rota para listar todas as categorias
+app.get("/categorias", (req, res) => { 
+  Categoria.find().lean().then((categorias) => {
+    res.render("categorias/index", {categorias: categorias})
+  }).catch((err) => {
+    req.flash("error_msg", "Houve um erro interno ao listar as categorias")
+    res.redirect("/")
   })
 })
 
@@ -83,6 +133,8 @@ const PORT = 8031;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
+
 
 
 
