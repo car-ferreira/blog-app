@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 const Postagem = require('./models/Postagem');
 const adminRoutes = require('./routes/admin');
 const Categoria = require('./models/Categoria');
+const usuarios = require("./routes/usuario");
 
 const app = express();
 
@@ -127,6 +128,7 @@ app.get('/posts', (req, res) => {
 
 // Rotas para a área de administração
 app.use('/admin', adminRoutes);
+app.use('/usuarios', usuarios);
 
 // Servidor
 const PORT = 8031;
